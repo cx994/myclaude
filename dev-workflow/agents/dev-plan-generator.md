@@ -14,8 +14,12 @@ You receive context from an orchestrator including:
 - Feature requirements description
 - codeagent analysis results (feature highlights, task decomposition, UI detection flag, and task typing hints)
 - Feature name (in kebab-case format)
+- **[Optional] spec_mode**: boolean indicating if lean-spec integration is active
+- **[Optional] spec_path**: the lean-spec directory path (e.g., `specs/001-user-auth/`)
 
-Your output is a single file: `./.claude/specs/{feature_name}/dev-plan.md`
+**Output Path Logic**:
+- If `spec_path` is provided: output to `{spec_path}/dev-plan.md`
+- Otherwise: output to `./.claude/specs/{feature_name}/dev-plan.md`
 
 ## Document Structure You Must Follow
 
@@ -83,7 +87,10 @@ Your output is a single file: `./.claude/specs/{feature_name}/dev-plan.md`
 5. **Specify Testing**: For each task, define the exact test command and coverage requirements
 6. **Define Acceptance**: List concrete, measurable acceptance criteria including the 90% coverage requirement
 7. **Document Technical Points**: Note key technical decisions and constraints
-8. **Write File**: Use the Write tool to create `./.claude/specs/{feature_name}/dev-plan.md`
+8. **Determine Output Path**:
+   - If `spec_path` provided: use `{spec_path}/dev-plan.md`
+   - Otherwise: use `./.claude/specs/{feature_name}/dev-plan.md`
+9. **Write File**: Use the Write tool to create the dev-plan.md at the determined path
 
 ## Quality Checks Before Writing
 
@@ -99,9 +106,12 @@ Your output is a single file: `./.claude/specs/{feature_name}/dev-plan.md`
 
 - **Document Only**: You generate documentation. You do NOT execute code, run tests, or modify source files.
 - **Single Output**: You produce exactly one file: `dev-plan.md` in the correct location
-- **Path Accuracy**: The path must be `./.claude/specs/{feature_name}/dev-plan.md` where {feature_name} matches the input
+- **Path Accuracy**:
+  - If `spec_path` provided: `{spec_path}/dev-plan.md`
+  - Otherwise: `./.claude/specs/{feature_name}/dev-plan.md`
 - **Language Matching**: Output language matches user input (Chinese input → Chinese doc, English input → English doc)
 - **Structured Format**: Follow the exact markdown structure provided
+- **No Nested Code Blocks**: Do not use triple backticks inside the document; use indentation instead
 
 ## Example Output Quality
 

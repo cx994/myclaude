@@ -1,10 +1,73 @@
-# /dev - Minimal Dev Workflow
+# /dev + /spec - Spec-Driven Development Workflow
 
 ## Overview
 
-A freshly designed lightweight development workflow with no legacy baggage, focused on delivering high-quality code fast.
+A two-phase development workflow integrating lean-spec for spec-driven development:
 
-## Flow
+- **Phase A (`/spec`)**: Planning - requirements clarification, dependency analysis, multi-agent review
+- **Phase B (`/dev`)**: Execution - parallel development with 90% coverage enforcement
+
+## Complete Flow
+
+```
+/spec "feature description"
+  ↓
+Search existing specs (avoid duplicates)
+  ↓
+Requirements clarification (2-3 rounds)
+  ↓
+Dependency analysis (link to existing specs)
+  ↓
+Create lean-spec
+  ↓
+Codex + Gemini review
+  ↓
+[STOP] Wait for user approval
+  ↓
+User: "Approve" or /dev @specs/{name}
+  ↓
+/dev reads spec → parallel execution → 90% coverage
+  ↓
+Auto-update spec status to complete
+```
+
+## Quick Start
+
+```bash
+# Phase A: Create and review spec
+/spec "实现用户登录功能"
+
+# ... clarification, review, approval checkpoint ...
+
+# Phase B: Execute development
+/dev @specs/user-auth
+```
+
+## /spec - Phase A (Planning)
+
+### What it does
+
+1. **Discovery**: Search existing specs for duplicates/related work
+2. **Clarification**: 2-3 rounds of requirement questions
+3. **Dependency Analysis**: Identify upstream/downstream spec dependencies
+4. **Create Spec**: Use lean-spec to create structured spec
+5. **Multi-Agent Review**: Codex (technical) + Gemini (clarity) review
+6. **Approval Checkpoint**: STOP and wait for user approval
+
+### Usage
+
+```bash
+/spec "Add payment integration"
+```
+
+### Key Features
+
+- **Duplicate detection**: Searches existing specs before creating
+- **Dependency linking**: Auto-links `depends_on` relationships
+- **Dual review**: Codex for technical soundness, Gemini for clarity
+- **Pause & Wait**: Never proceeds to implementation without approval
+
+## /dev - Phase B (Execution)
 
 ```
 /dev trigger
@@ -80,6 +143,71 @@ Done (generate summary)
 ```
 
 No CLI flags required; workflow starts with an interactive backend selection.
+
+## Spec Mode (lean-spec Integration)
+
+When using lean-spec for spec-driven development, `/dev` can read requirements from an existing spec and sync status automatically.
+
+### Triggering Spec Mode
+
+```bash
+# Option 1: Reference spec directly
+/dev @specs/user-auth
+
+# Option 2: Use --spec flag
+/dev --spec user-auth
+
+# Option 3: After discussing a spec, say "Approve" or "开始"
+```
+
+### Spec Mode Flow
+
+```
+lean-spec create user-auth
+  ↓
+Edit spec (fill in requirements)
+  ↓
+/dev @specs/user-auth
+  ↓
+Auto: lean-spec update user-auth --status in-progress
+  ↓
+Step 0: Confirm backends (skip if spec has allowed_backends)
+  ↓
+Step 1: Confirm requirements (no multi-round clarification)
+  ↓
+Step 2-5: Normal execution
+  ↓
+Step 6: lean-spec update user-auth --status complete
+```
+
+### Workflow Adjustments in Spec Mode
+
+| Step | Normal Mode | Spec Mode |
+|------|-------------|-----------|
+| Step 0 | Ask backends | Use spec's `allowed_backends` or ask |
+| Step 1 | 2-3 rounds clarification | Confirm only: "需求完整？" |
+| Step 6 | Summary only | Summary + auto update spec status |
+
+### Spec Template for /dev
+
+Add `allowed_backends` to frontmatter for automatic backend selection:
+
+```yaml
+---
+status: planned
+priority: high
+allowed_backends: [codex, gemini]  # Optional
+---
+```
+
+### Output Structure in Spec Mode
+
+```
+specs/
+├── 001-user-auth/
+│   ├── SPEC.md         # lean-spec managed
+│   └── dev-plan.md     # /dev generated
+```
 
 ## Output Structure
 
@@ -164,29 +292,40 @@ dev-plan.md generated with typed tasks ✓
 dev-workflow/
 ├── README.md                          # This doc
 ├── commands/
-│   └── dev.md                         # /dev workflow orchestrator definition
+│   ├── dev.md                         # /dev workflow (Phase B - execution)
+│   └── spec.md                        # /spec workflow (Phase A - planning)
 └── agents/
     └── dev-plan-generator.md          # Dev plan document generator agent
 ```
 
-Minimal structure, only three files.
+Four files total - minimal and clear.
 
 ## When to Use
 
-✅ **Good for**:
-- Any feature size
-- Fast iterations
-- High test coverage needs
-- Wanting concurrent speed-up
+### Use `/spec` when:
+- Starting a new feature that needs planning
+- Feature affects multiple parts of the system
+- You want Codex/Gemini review before implementation
+- You need to understand dependencies with existing work
+
+### Use `/dev` directly when:
+- Spec already exists (use `/dev @specs/{name}`)
+- Simple, well-defined task with clear requirements
+- Bug fix or small change that doesn't need spec
+
+### Skip both when:
+- Trivial changes (typo fix, config tweak)
+- Single-line fixes
 
 ## Design Principles
 
-1. **KISS**: keep it simple
-2. **Disposable**: no persistent config
-3. **Quality first**: enforce 90% coverage
-4. **Concurrency first**: leverage codeagent
-5. **No legacy baggage**: clean-slate design
+1. **Two-Phase Separation**: Planning (/spec) and execution (/dev) are distinct
+2. **Pause & Wait**: Never auto-proceed to implementation without approval
+3. **Dependency Awareness**: Specs are linked, not isolated
+4. **Multi-Agent Review**: Codex + Gemini catch different issues
+5. **Quality First**: 90% coverage enforced
+6. **KISS**: Minimal abstraction, direct workflows
 
 ---
 
-**Philosophy**: zero tolerance for complexity—ship the smallest usable solution, like Linus would.
+**Philosophy**: Plan deliberately, execute fast. Spec-driven development with Linus-style pragmatism.
