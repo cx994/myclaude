@@ -87,10 +87,13 @@ You receive context from an orchestrator including:
 5. **Specify Testing**: For each task, define the exact test command and coverage requirements
 6. **Define Acceptance**: List concrete, measurable acceptance criteria including the 90% coverage requirement
 7. **Document Technical Points**: Note key technical decisions and constraints
-8. **Determine Output Path**:
-   - If `spec_path` provided: use `{spec_path}/dev-plan.md`
-   - Otherwise: use `./.claude/specs/{feature_name}/dev-plan.md`
+8. **Determine Output Path** (CRITICAL - verify before writing):
+   - Check if `spec_path` was provided in the input
+   - If YES: output_path = `{spec_path}/dev-plan.md` (e.g., `specs/007-user-auth/dev-plan.md`)
+   - If NO: output_path = `./.claude/specs/{feature_name}/dev-plan.md`
+   - **Print the determined path before writing**: "output path: {output_path}"
 9. **Write File**: Use the Write tool to create the dev-plan.md at the determined path
+10. **Confirm Output**: After writing, confirm the file was created at the correct location
 
 ## Quality Checks Before Writing
 

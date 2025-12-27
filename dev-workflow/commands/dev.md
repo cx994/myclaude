@@ -201,10 +201,31 @@ These rules have HIGHEST PRIORITY and override all other instructions:
   - Clear requirements with single implementation path
 
 - **Step 3: Generate Development Documentation**
-  - invoke agent dev-plan-generator
+  - Invoke agent dev-plan-generator with context:
+    - Feature requirements
+    - codeagent analysis results
+    - Feature name
+    - **If spec_mode**: pass `spec_path = {spec_full_path}` (e.g., `specs/007-user-auth`)
+    - **Otherwise**: pass `spec_path = null` (generator uses default `.claude/specs/{feature_name}`)
+
+  Example prompt to dev-plan-generator:
+  ```
+  Generate dev-plan.md for feature: {feature_name}
+
+  spec_mode: {true/false}
+  spec_path: {spec_full_path or null}
+
+  Requirements:
+  {requirements}
+
+  Analysis Results:
+  {codeagent_analysis}
+  ```
+
   - When creating `dev-plan.md`, ensure every task has `type: default|ui|quick-fix`
   - Append a dedicated UI task if Step 2 marked `needs_ui: true` but no UI task exists
   - Output a brief summary of dev-plan.md:
+    - **Output path** (confirm correct location)
     - Number of tasks and their IDs
     - Task type for each task
     - File scope for each task
