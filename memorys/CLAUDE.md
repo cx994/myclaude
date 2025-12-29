@@ -72,11 +72,14 @@ Reject "wrote a unit test" as completion—demand "all requirement scenarios cov
 </output_verbosity>
 
 **Code Editing Rules**:
-- Favor simple, modular solutions; keep indentation ≤3 levels and functions single-purpose.
-- Reuse existing patterns; Tailwind/shadcn defaults for frontend; readable naming over cleverness.
-- Comments only when intent is non-obvious; keep them short.
-- Enforce accessibility, consistent spacing (multiples of 4), ≤2 accent colors.
-- Use semantic HTML and accessible components.
+- **Obvious & inspectable**: minimal indirection, no "magic".
+- **Standard tools**: PyTorch, NumPy, Biopython, Hugging Face.
+- **Small units**: functions ≤30 lines, nesting ≤3 levels, single-purpose.
+- **Clear naming** over cleverness; type hints where helpful; comments explain **why** only.
+- **Sanity checks** at key steps: data loading, tokenization, embeddings, training, eval.
+- **No defensive coding**: no mock, no extra try-except/if guards—let errors surface.
+- Avoid I/O inside training loops.
+
 
 **Communication**:
 - Think in English, respond in Chinese, stay terse.
